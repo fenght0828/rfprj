@@ -1,0 +1,22 @@
+*** Variables ***
+${IP}             192.168.188.128
+
+*** Keywords ***
+setup
+    [Arguments]    ${table_name}
+    log    预置条件/搭建环境
+    Connect To Database    pymysql    scott    tester    passwd    ${IP}    3306
+    ...    utf8
+    OperatingSystem.run    taskkill /f /im chromedriver.exe    #杀残留的driver进程
+    Execute Sql String    DELETE FROM ${table_name};    #清理脏数据
+    ${x}    Row Count    select * from scott.order_item where name='iphone' and quantity='45';
+    ${y}    Evaluate    str($x+1)
+    log    1.打开网站
+    Open Browser    http://${IP}/mt    chrome
+    Set Global Variable    ${xx}    abcc
+
+teardown
+    log    9.恢复环境
+    Disconnect From Database    #关闭数据库,释放资源
+    Comment    sleep    3    #强制等待    #脚本写完后需删，用例多时浪费时间
+    Close Browser
